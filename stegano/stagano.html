@@ -7,12 +7,14 @@
 <body>
 	<button onClick="stegano();" >dechiffrer</button>
 	<p><img src="old1bit.png" id='monImage'></p>
+	<p id="decodedmessage"></p>
 
 	<script>
 	function stegano() {			
 		// LECTURES DES PIXELS DE L'IMAGE
 		/////////////////////////////////////
 		var img = document.getElementById('monImage');
+		var decodedMessage = document.getElementById('decodedmessage');
 		var canvas = document.createElement('canvas')
 		var context = canvas.getContext('2d');
 		
@@ -25,7 +27,7 @@
 		var imgd = context.getImageData(0, 0, width, height);
 		var pix = imgd.data;
 		console.log("height="+height+", width="+width);
-		
+
 		// Génération de tableaux 2D pour simplifier la gestion du voisinage
 		// ex: pour une image de 3 colonnes 2 lignes
 		// 1 tab 1D pix = [r,g,b,a, r,g,b,a, r,g,b,a, r,g,b,a, r,g,b,a, r,g,b,a,] 
@@ -36,7 +38,7 @@
 		var tg = new Array(width).fill().map(() => Array(height));
 		var tb = new Array(width).fill().map(() => Array(height));
 		var ta = new Array(width).fill().map(() => Array(height));
-		
+
 		// copie des valeurs 1D -> 2D
 		for (var y = 0; y < height; y++) { 
 			for (var x = 0; x < width; x++) {
@@ -57,12 +59,34 @@
 				console.log("(r,g,b,a)["+x+","+y+"] = ("+tr[x][y]+","+tg[x][y]+","+tb[x][y]+","+ta[x][y]+")");
 			}
 		}
+
+				
+		const decodedLetters = []
+		let decodedByte = "";
+
+		for (var y = 0; y < height; y++) { 
+			for (var x = 0; x < width; x++) {
+				let code = tr[x][y] % 2
+				decodedByte += code
+				if (decodedByte.length === 8) {
+					let letter = String.fromCharCode(parseInt(decodedByte, 2));
+					decodedLetters.push(letter)
+					decodedByte = ""
+				}
+				tr[x][y] = code * 200;
+				tg[x][y] = code * 200;
+				tb[x][y] = code * 200;
+			}
+		}
+
+		decodedMessage.innerHTML = decodedLetters.join("")
+		
 		
 		// RETOUR EN 1D POUR AFFICHER LES MODIFICATIONS DANS L'IMAGE
 		// 4 tab 2D (r,g,b,a) -> 1 tab 1D POUR METTRE A JOUR L'IMAGE
 		for (var y = 0; y < height; y++) { 
 			for (var x = 0; x < width; x++) {
-				pix[x*4+y*(width*4)+0] = 0;
+				pix[x*4+y*(width*4)+0] = tr[x][y];
 				pix[x*4+y*(width*4)+1] = tg[x][y];
 				pix[x*4+y*(width*4)+2] = tb[x][y];
 				pix[x*4+y*(width*4)+3] = ta[x][y];
