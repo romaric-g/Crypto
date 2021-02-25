@@ -1,0 +1,2 @@
+3. La clé 'e' correspond à un décalage de 4, pour le decodage, il faut faire un décalage de 4 dans l'autre sens
+4. il y a un decalage de 13 caracteres

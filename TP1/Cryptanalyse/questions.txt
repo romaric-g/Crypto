@@ -1,0 +1,1 @@
+1. On calcule la fréquence de chaque lettre du texte. Si on a connaissance de la fréquence des lettres de l'alphabet dans cette langue, on peut potentiellement déchiffrer le texte
